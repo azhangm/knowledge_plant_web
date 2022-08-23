@@ -56,13 +56,6 @@
             {{ text }}
           </span>
               </template>
-              <template #extra>
-                <img
-                    width="272"
-                    alt="logo"
-                    :src=item.cover
-                />
-              </template>
               <a-list-item-meta :description="item.description">
                 <template #title>
                   <a :href="item.href">{{ item.name }}</a>
@@ -126,3 +119,13 @@ export default defineComponent({
 });
 
 </script>
+
+<style scoped>
+.ant-avatar {
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  border-radius: 8%;
+  margin: 5px 0;
+}
+</style>
