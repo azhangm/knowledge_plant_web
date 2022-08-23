@@ -46,13 +46,8 @@
         </a-menu>
       </a-layout-sider>
       <a-layout-content :style="{ padding: '0 24px', minHeight: '280px' }">
-        <a-list item-layout="vertical" size="large" :pagination="pagination" :data-source="listData">
-          <template #footer>
-            <div>
-              <b>ant design vue</b>
-              footer part
-            </div>
-          </template>
+        <a-list item-layout="vertical" size="large" :pagination="pagination" :data-source="ebooks"  :grid="{ gutter: 20, column: 3 }">
+
           <template #renderItem="{ item }">
             <a-list-item key="item.title">
               <template #actions>
@@ -65,16 +60,15 @@
                 <img
                     width="272"
                     alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    :src=item.cover
                 />
               </template>
               <a-list-item-meta :description="item.description">
                 <template #title>
-                  <a :href="item.href">{{ item.title }}</a>
+                  <a :href="item.href">{{ item.name }}</a>
                 </template>
-                <template #avatar><a-avatar :src="item.avatar" /></template>
+                <template #avatar><a-avatar :src="item.cover" /></template>
               </a-list-item-meta>
-              {{ item.content }}
             </a-list-item>
           </template>
         </a-list>
@@ -95,31 +89,18 @@ export default defineComponent({
     console.log("Setup");
     const ebooks = ref([]);
     axios.get("http://localhost:3000/eBook/list/").then((resp) => {
-      ebooks.value = resp.data;
-        console.log(ebooks.value)
+      ebooks.value = resp.data.data;
+      console.log(1);
+        console.log(ebooks.value);
     });
     onMounted(() => {
       console.log("onMounted");
     });
-
-    for (let i = 0; i < 23; i++) {
-      listData.push({
-        href: 'https://www.antdv.com/',
-        title: `ant design vue part ${i}`,
-        avatar: 'https://joeschmoe.io/api/v1/random',
-        description:
-            'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-        content:
-            'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-      });
-
-    }
-
     const pagination = {
       onChange: (page: number) => {
         console.log(page);
       },
-      pageSize: 3,
+      pageSize: 9,
     };
     const actions: Record<string, string>[] = [
       { type: 'StarOutlined', text: '156' },
