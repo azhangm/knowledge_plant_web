@@ -2,16 +2,18 @@
   <a-layout id="components-layout-demo-top-side-2">
     <TheHeader/>
   <router-view/>
-    <a-layout-footer style="text-align: center">
-      zm知识星球
-    </a-layout-footer>
+    <TheFoot/>
   </a-layout>
 </template>
 
 <script lang="ts">
   import TheHeader from '@/components/the-header.vue'
+  import TheFoot from '@/components/the-foot.vue'
   export default {
-    components: {TheHeader}
+    components: {
+      TheHeader,
+      TheFoot
+    }
   }
 
 </script>
