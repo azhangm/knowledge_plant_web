@@ -81,7 +81,7 @@ export default defineComponent({
     const listData: Record<string, string>[] = [];
     console.log("Setup");
     const ebooks = ref([]);
-    axios.get("http://localhost:3000/eBook/list/").then((resp) => {
+    axios.get(process.env.VUE_APP_SERVER + "/eBook/list/").then((resp) => {
       ebooks.value = resp.data.data;
       console.log(1);
         console.log(ebooks.value);
