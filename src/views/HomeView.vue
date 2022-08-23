@@ -4,8 +4,6 @@
     <a-layout style="padding: 24px 0; background: #fff">
       <a-layout-sider width="200" style="background: #fff">
         <a-menu
-            v-model:selectedKeys="selectedKeys2"
-            v-model:openKeys="openKeys"
             mode="inline"
             style="height: 100%"
         >
@@ -56,10 +54,17 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
-
+import  axios from 'axios';
 export default defineComponent({
   name: 'HomeView',
+  //组件 加载完之后初始执行
+  setup() {
+    console.log("Setup");
+    axios.get("http://localhost:3000/eBook/list/").then((resp) => {
+        console.log(resp);
+
+    });
+  },
   components: {
   },
 });
