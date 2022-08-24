@@ -82,9 +82,13 @@ export default defineComponent({
     console.log("Setup");
     const ebooks = ref([]);
     axios.get("/eBook/list/",{
+      params : {
+        page : 1,
+        size : 1000
+      },
     } ).then((resp) => {
 
-      ebooks.value = resp.data.data;
+      ebooks.value = resp.data.data.list;
       console.log(2);
         console.log(ebooks.value);
     });
