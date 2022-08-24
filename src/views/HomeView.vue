@@ -81,7 +81,9 @@ export default defineComponent({
     const listData: Record<string, string>[] = [];
     console.log("Setup");
     const ebooks = ref([]);
-    axios.get("/eBook/list/").then((resp) => {
+    axios.get("/eBook/list/",{
+    } ).then((resp) => {
+
       ebooks.value = resp.data.data;
       console.log(2);
         console.log(ebooks.value);
