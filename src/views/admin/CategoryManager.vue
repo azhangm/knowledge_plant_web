@@ -65,7 +65,12 @@
         <a-input v-model:value="category.name" />
       </a-form-item>
       <a-form-item label="父分类">
-        <a-input v-model:value="category.parent" />
+        <a-select ref="select" v-model:value="category.parent">
+          <a-select-option value="0">无</a-select-option>
+          <a-select-option v-for="c in level1" :key="c.id" :value="c.id">
+                  {{c.name}}
+          </a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item label="顺序">
         <a-input v-model:value="category.sort" />
@@ -84,9 +89,15 @@
         <a-input v-model:value="category.name" />
       </a-form-item>
       <a-form-item label="父分类">
-        <a-input v-model:value="category.parent" />
-      </a-form-item>
-      <a-form-item label="顺序">
+      <a-select ref="select" v-model:value="category.parent">
+        <a-select-option value="0">无</a-select-option>
+        <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="c.id === category.id">
+          {{c.name}}
+        </a-select-option>
+      </a-select>
+        </a-form-item>
+
+        <a-form-item label="顺序">
         <a-input v-model:value="category.sort" />
       </a-form-item>
     </a-form>
@@ -161,7 +172,7 @@ export default defineComponent({
       modalLoading.value = true;
       // category.value.category1Id = categoryIds.value[0];
       // category.value.category2Id = categoryIds.value[1];
-      axios.post("/category/update", category.value).then((response) => {
+      axios.put("/category/update/", category.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {
@@ -187,7 +198,7 @@ export default defineComponent({
       modalLoading.value = true;
       // category.value.category1Id = categoryIds.value[0];
       // category.value.category2Id = categoryIds.value[1];
-      axios.post("/category/save", category.value).then((response) => {
+      axios.post("/category/save/", category.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {

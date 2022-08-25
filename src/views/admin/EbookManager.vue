@@ -217,7 +217,7 @@ export default defineComponent({
       modalLoading.value = true;
       // ebook.value.category1Id = categoryIds.value[0];
       // ebook.value.category2Id = categoryIds.value[1];
-      axios.post("/eBook/update", ebook.value).then((response) => {
+      axios.put("/eBook/update", ebook.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {
