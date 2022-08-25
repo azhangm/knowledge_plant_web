@@ -100,6 +100,7 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
           console.log("树形结构：", level1.value);
+          // 加载玩分类后在加载电子书 否则电子书报错
           handleQueryEbook();
 
         } else {
