@@ -167,12 +167,13 @@ export default defineComponent({
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
-      ebook.value.category1Id = categoryIds.value[0];
-      ebook.value.category2Id = categoryIds.value[1];
-      axios.post("/ebook/save", ebook.value).then((response) => {
+      // ebook.value.category1Id = categoryIds.value[0];
+      // ebook.value.category2Id = categoryIds.value[1];
+      axios.post("/eBook/update", ebook.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {
+          console.log(response);
           modalVisible.value = false;
 
           // 重新加载列表
