@@ -117,7 +117,7 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
-
+import {Tool} from '@/assets/ts/tool'
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
@@ -241,7 +241,7 @@ export default defineComponent({
     const edit = (record: any) => {
       modalVisible.value = true;
       // categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
-      ebook.value = record;
+      ebook.value = Tool.copy(record) ;
     };
     const handleModalAdd = () => {
       modalLoading.value = true;
