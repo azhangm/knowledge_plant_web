@@ -27,6 +27,10 @@
   <a-layout-content
       :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
   >
+    <div v-show="isShowWelcome">
+      你好~~~~欢迎你
+    </div>
+
     <a-list v-show="!isShowWelcome" item-layout="vertical" size="large" :grid="{ gutter: 20, column: 3 }" :data-source="ebooks">
       <template #renderItem="{ item }">
         <a-list-item key="item.name">
@@ -66,7 +70,7 @@ import {Tool} from "@/assets/ts/tool";
 import {message} from "ant-design-vue";
 let ebooks = ref([]);
 const loading = ref(false);
-
+let isShowWelcome = ref(true);
 export default defineComponent({
   name: 'HomeView',
   components: {
@@ -108,7 +112,11 @@ export default defineComponent({
         }
       });
     };
+  const handleClick = (value : any) => {
+    // console.log(value.key);
+    isShowWelcome.value = value.key === 'welcome';
 
+  }
 
     onMounted(() => {
       handleQueryCategory();
@@ -117,6 +125,8 @@ export default defineComponent({
     return {
       ebooks,
       level1,
+      isShowWelcome,
+      handleClick
     }
   }
 });
