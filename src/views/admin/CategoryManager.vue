@@ -25,7 +25,7 @@
       <a-table
           :columns="columns"
           :row-key="record => record.id"
-          :data-source="categorys"
+          :data-source="level1"
           :loading="loading"
           @change="handleTableChange"
           :pagination="false"
@@ -101,6 +101,7 @@ import {Tool} from '@/assets/ts/tool'
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
+    const level1 = ref();
     const param = ref();
     param.value = {};
     const categorys = ref([]);
@@ -138,11 +139,13 @@ export default defineComponent({
       axios.get("/category/selectAll/").then((resp) => {
         loading.value = false;
         const data = resp.data;
-        console.log(resp);
         if (data.success) {
           categorys.value = data.data;
-
-          // 重置分页按钮
+          level1.value = [];
+          console.log(categorys.value);
+           level1.value = Tool.array2Tree(categorys.value,0);
+          console.log(level1.value);
+           // 重置分页按钮
         } else {
           message.error(data.message);
         }
@@ -162,12 +165,10 @@ export default defineComponent({
         modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {
-          console.log(response);
           modalVisible.value = false;
 
           // 重新加载列表
-          handleQuery({
-          });
+          handleQuery({});
         } else {
           message.error(data.message);
         }
@@ -194,8 +195,7 @@ export default defineComponent({
           addEbookVisable.value = false;
 
           // 重新加载列表
-          handleQuery({
-          });
+          handleQuery({});
         } else {
           message.error(data.message);
         }
@@ -230,12 +230,11 @@ export default defineComponent({
     });
 
     return {
-      categorys,
       param,
       columns,
       loading,
       handleQuery,
-
+      level1,
       edit,
       add,
 
