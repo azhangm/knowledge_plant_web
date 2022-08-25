@@ -55,17 +55,17 @@
     </a-layout-content>
   </a-layout>
   <a-modal
-      title="分类表单"
+      title="文档表单"
       v-model:visible="addEbookVisable"
       :confirm-loading="modalLoading"
       @ok="handleModalAdd"
   >
-    <a-form :model="category" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+    <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="名称">
-        <a-input v-model:value="category.name" />
+        <a-input v-model:value="doc.name" />
       </a-form-item>
-      <a-form-item label="父分类">
-        <a-select ref="select" v-model:value="category.parent">
+      <a-form-item label="父文档">
+        <a-select ref="select" v-model:value="doc.parent">
           <a-select-option value="0">无</a-select-option>
           <a-select-option v-for="c in level1" :key="c.id" :value="c.id">
                   {{c.name}}
@@ -73,32 +73,32 @@
         </a-select>
       </a-form-item>
       <a-form-item label="顺序">
-        <a-input v-model:value="category.sort" />
+        <a-input v-model:value="doc.sort" />
       </a-form-item>
     </a-form>
   </a-modal>
 
   <a-modal
-      title="分类表单"
+      title="文档表单"
       v-model:visible="modalVisible"
       :confirm-loading="modalLoading"
       @ok="handleModalOk"
   >
-    <a-form :model="category" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+    <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="名称">
-        <a-input v-model:value="category.name" />
+        <a-input v-model:value="doc.name" />
       </a-form-item>
-      <a-form-item label="父分类">
-      <a-select ref="select" v-model:value="category.parent">
+      <a-form-item label="父文档">
+      <a-select ref="select" v-model:value="doc.parent">
         <a-select-option value="0">无</a-select-option>
-        <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="c.id === category.id">
+        <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="c.id === doc.id">
           {{c.name}}
         </a-select-option>
       </a-select>
         </a-form-item>
 
         <a-form-item label="顺序">
-        <a-input v-model:value="category.sort" />
+        <a-input v-model:value="doc.sort" />
       </a-form-item>
     </a-form>
   </a-modal>
@@ -109,14 +109,15 @@ import { defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
 import {Tool} from '@/assets/ts/tool'
+const level1 = ref();
+const param = ref();
+param.value = {};
+const docs = ref([]);
+const loading = ref(false);
+
 export default defineComponent({
-  name: 'AdminCategory',
+  name: 'AdminDoc',
   setup() {
-    const level1 = ref();
-    const param = ref();
-    param.value = {};
-    const categorys = ref([]);
-    const loading = ref(false);
 
     const columns = [
       {
@@ -124,7 +125,7 @@ export default defineComponent({
         dataIndex: 'name'
       },
       {
-        title: '父分类',
+        title: '父文档',
         dataIndex: 'parent',
         key: 'parent'
       },
@@ -146,15 +147,15 @@ export default defineComponent({
     const handleQuery = (params: any) => {
       loading.value = true;
       // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
-      categorys.value = [];
-      axios.get("/category/selectAll/").then((resp) => {
+      docs.value = [];
+      axios.get("/doc/selectAll/").then((resp) => {
         loading.value = false;
         const data = resp.data;
         if (data.success) {
-          categorys.value = data.data;
+          docs.value = data.data;
           level1.value = [];
-          console.log(categorys.value);
-           level1.value = Tool.array2Tree(categorys.value,0);
+          console.log(docs.value);
+           level1.value = Tool.array2Tree(docs.value,0);
           console.log(level1.value);
            // 重置分页按钮
         } else {
@@ -163,16 +164,16 @@ export default defineComponent({
       });
     };
 
-    const categoryIds = ref();
-    const category = ref();
+    const docIds = ref();
+    const doc = ref();
     const addEbookVisable = ref(false);
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
-      // category.value.category1Id = categoryIds.value[0];
-      // category.value.category2Id = categoryIds.value[1];
-      axios.put("/category/update/", category.value).then((response) => {
+      // doc.value.doc1Id = docIds.value[0];
+      // doc.value.doc2Id = docIds.value[1];
+      axios.put("/doc/update/", doc.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {
@@ -191,14 +192,14 @@ export default defineComponent({
      */
     const edit = (record: any) => {
       modalVisible.value = true;
-      // categoryIds.value = [category.value.category1Id, category.value.category2Id]
-      category.value = Tool.copy(record) ;
+      // docIds.value = [doc.value.doc1Id, doc.value.doc2Id]
+      doc.value = Tool.copy(record) ;
     };
     const handleModalAdd = () => {
       modalLoading.value = true;
-      // category.value.category1Id = categoryIds.value[0];
-      // category.value.category2Id = categoryIds.value[1];
-      axios.post("/category/save/", category.value).then((response) => {
+      // doc.value.doc1Id = docIds.value[0];
+      // doc.value.doc2Id = docIds.value[1];
+      axios.post("/doc/save/", doc.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {
@@ -217,11 +218,11 @@ export default defineComponent({
      */
     const add = () => {
       addEbookVisable.value = true;
-      category.value = {};
+      doc.value = {};
     };
 
     const handleDelete = (id: number) => {
-      axios.delete("/category/delete/" + id).then((response) => {
+      axios.delete("/doc/delete/" + id).then((response) => {
         const data = response.data; // data = commonResp
         if (data.success) {
           // 重新加载列表
@@ -249,13 +250,13 @@ export default defineComponent({
       edit,
       add,
 
-      category,
+      doc,
       addEbookVisable,
       handleModalAdd,
       modalVisible,
       modalLoading,
       handleModalOk,
-      categoryIds,
+      docIds,
 
       handleDelete
     }

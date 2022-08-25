@@ -122,6 +122,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
 import {Tool} from '@/assets/ts/tool'
+const loading = ref(false)
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
@@ -133,7 +134,6 @@ export default defineComponent({
       pageSize: 5,
       total: 0
     });
-    const loading = ref(false);
 
     const columns = [
       {
@@ -303,7 +303,6 @@ export default defineComponent({
         if (data.success) {
           categorys = data.data;
           console.log("原始数组：", categorys);
-
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
           console.log("树形结构：", level1.value);
