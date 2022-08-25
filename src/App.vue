@@ -18,7 +18,7 @@
 
 </script>
 
-<style>
+<style >
 #components-layout-demo-top-side-2 .logo {
   float: left;
   width: 120px;
