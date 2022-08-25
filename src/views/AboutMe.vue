@@ -1,5 +1,5 @@
 <template>
-阿迪斯十大
+阿迪斯十大得到
 </template>
 
 <script>
