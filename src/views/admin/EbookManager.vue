@@ -3,7 +3,15 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-
+      <p>
+        <a-form layout="inline" :model="param">
+          <a-form-item>
+            <a-button type="primary" @click="add()" size="large">
+              新增
+            </a-button>
+          </a-form-item>
+        </a-form>
+      </p>
       <a-table
           :columns="columns"
           :row-key="record => record.id"
@@ -32,7 +40,7 @@
                 cancel-text="否"
                 @confirm="handleDelete(record.id)"
             >
-              <a-button type="danger">
+              <a-button type="danger" @click="handleDelete">
                 删除
               </a-button>
             </a-popconfirm>
@@ -41,6 +49,32 @@
       </a-table>
     </a-layout-content>
   </a-layout>
+  <a-modal
+      title="电子书表单"
+      v-model:visible="addEbookVisable"
+      :confirm-loading="modalLoading"
+      @ok="handleModalAdd"
+  >
+    <a-form :model="ebook" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+      <a-form-item label="封面">
+        <a-input v-model:value="ebook.cover" />
+      </a-form-item>
+      <a-form-item label="名称">
+        <a-input v-model:value="ebook.name" />
+      </a-form-item>
+      <a-form-item label="分类">
+        <a-cascader
+            v-model:value="categoryIds"
+            :field-names="{ label: 'name', value: 'id', children: 'children' }"
+            :options="level1"
+        />
+      </a-form-item>
+      <a-form-item label="描述">
+        <a-input v-model:value="ebook.description" type="textarea" />
+      </a-form-item>
+    </a-form>
+  </a-modal>
+
   <a-modal
       title="电子书表单"
       v-model:visible="modalVisible"
@@ -72,14 +106,15 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
-
+const param = ref();
+param.value = {};
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
     const ebooks = ref();
     const pagination = ref({
       current: 1,
-      pageSize: 10,
+      pageSize: 5,
       total: 0
     });
     const loading = ref(false);
@@ -163,6 +198,7 @@ export default defineComponent({
     };
     const categoryIds = ref();
     const ebook = ref();
+    const addEbookVisable = ref(false);
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const handleModalOk = () => {
@@ -195,18 +231,37 @@ export default defineComponent({
       // categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
       ebook.value = record;
     };
+    const handleModalAdd = () => {
+      modalLoading.value = true;
+      // ebook.value.category1Id = categoryIds.value[0];
+      // ebook.value.category2Id = categoryIds.value[1];
+      axios.post("/eBook/save", ebook.value).then((response) => {
+        modalLoading.value = false;
+        const data = response.data; // data = commonResp
+        if (data.success) {
+          console.log(response);
+          addEbookVisable.value = false;
 
-
+          // 重新加载列表
+          handleQuery({
+            page: pagination.value.current,
+            size: pagination.value.pageSize,
+          });
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
     /**
      * 新增
      */
     const add = () => {
-      modalVisible.value = true;
+      addEbookVisable.value = true;
       ebook.value = {};
     };
 
     const handleDelete = (id: number) => {
-      axios.delete("/ebook/delete/" + id).then((response) => {
+      axios.delete("/eBook/delete/" + id).then((response) => {
         const data = response.data; // data = commonResp
         if (data.success) {
           // 重新加载列表
@@ -271,6 +326,7 @@ export default defineComponent({
 
     return {
       ebooks,
+      param,
       pagination,
       columns,
       loading,
@@ -282,6 +338,8 @@ export default defineComponent({
       add,
 
       ebook,
+      addEbookVisable,
+      handleModalAdd,
       modalVisible,
       modalLoading,
       handleModalOk,
