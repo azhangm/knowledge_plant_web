@@ -10,7 +10,7 @@
             </a-input>
           </a-form-item>
           <a-form-item>
-            <a-button type="primary" @click="handleQuery({page: 1, size: pagination.pageSize})" size="large">
+            <a-button type="primary" @click="handleQuery()" size="large">
               查询
             </a-button>
           </a-form-item>
@@ -26,9 +26,9 @@
           :columns="columns"
           :row-key="record => record.id"
           :data-source="categorys"
-          :pagination="pagination"
           :loading="loading"
           @change="handleTableChange"
+          :pagination="false"
       >
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" />
@@ -103,12 +103,7 @@ export default defineComponent({
   setup() {
     const param = ref();
     param.value = {};
-    const categorys = ref();
-    const pagination = ref({
-      current: 1,
-      pageSize: 5,
-      total: 0
-    });
+    const categorys = ref([]);
     const loading = ref(false);
 
     const columns = [
@@ -140,38 +135,20 @@ export default defineComponent({
       loading.value = true;
       // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
       categorys.value = [];
-      axios.get("/category/list/", {
-        params: {
-          page: params.page,
-          size: params.size,
-          keyword: param.value.name
-        }
-      }).then((resp) => {
+      axios.get("/category/selectAll/").then((resp) => {
         loading.value = false;
         const data = resp.data;
         console.log(resp);
         if (data.success) {
-          categorys.value = data.data.list;
+          categorys.value = data.data;
 
           // 重置分页按钮
-          pagination.value.current = params.page;
-          pagination.value.total = data.data.total;
         } else {
           message.error(data.message);
         }
       });
     };
 
-    /**
-     * 表格点击页码时触发
-     */
-    const handleTableChange = (pagination: any) => {
-      console.log("看看自带的分页参数都有啥：" + pagination);
-      handleQuery({
-        page: pagination.current,
-        size: pagination.pageSize
-      });
-    };
     const categoryIds = ref();
     const category = ref();
     const addEbookVisable = ref(false);
@@ -190,8 +167,6 @@ export default defineComponent({
 
           // 重新加载列表
           handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize,
           });
         } else {
           message.error(data.message);
@@ -220,8 +195,6 @@ export default defineComponent({
 
           // 重新加载列表
           handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize,
           });
         } else {
           message.error(data.message);
@@ -242,8 +215,6 @@ export default defineComponent({
         if (data.success) {
           // 重新加载列表
           handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize,
           });
           message.success("删除成功");
         } else {
@@ -252,49 +223,17 @@ export default defineComponent({
       });
     };
 
-    const level1 =  ref();
-    // /**
-    //  * 查询所有分类
-    //  **/
-    // const handleQueryCategory = () => {
-    //   loading.value = true;
-    //   axios.get("/category/all").then((response) => {
-    //     loading.value = false;
-    //     const data = response.data;
-    //     if (data.success) {
-    //       categorys = data.content;
-    //       console.log("原始数组：", categorys);
-    //
-    //       level1.value = [];
-    //       level1.value = Tool.array2Tree(categorys, 0);
-    //       console.log("树形结构：", level1.value);
-    //
-    //       // 加载完分类后，再加载分类，否则如果分类树加载很慢，则分类渲染会报错
-    //       handleQuery({
-    //         page: 1,
-    //         size: pagination.value.pageSize,
-    //       });
-    //     } else {
-    //       message.error(data.message);
-    //     }
-    //   });
-    // };
 
 
     onMounted(() => {
-      handleQuery({
-        page : 1,
-        size : pagination.value.pageSize
-      });
+      handleQuery({});
     });
 
     return {
       categorys,
       param,
-      pagination,
       columns,
       loading,
-      handleTableChange,
       handleQuery,
 
       edit,
@@ -307,7 +246,6 @@ export default defineComponent({
       modalLoading,
       handleModalOk,
       categoryIds,
-      level1,
 
       handleDelete
     }
