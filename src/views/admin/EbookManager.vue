@@ -34,6 +34,10 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" />
         </template>
+        <template v-slot:category="{ text : record }">
+          <span>{{getCategoryName(record.category1Id)}}/{{getCategoryName(record.category2Id)}}</span>
+
+        </template>
 
         <template v-slot:action="{ text : record }">
           <a-space size="small">
@@ -143,12 +147,7 @@ export default defineComponent({
       },
       {
         title: '分类',
-        dataIndex: 'category1Id',
-        // slots: { customRender: 'category' }
-      },
-      {
-        title: '分类',
-        dataIndex: 'category2Id'
+        slots: { customRender: 'category' }
       },
       {
         title: '文档数',
@@ -325,7 +324,6 @@ export default defineComponent({
       let result = "";
       categorys.forEach((item: any) => {
         if (item.id === cid) {
-          // return item.name; // 注意，这里直接return不起作用
           result = item.name;
         }
       });
