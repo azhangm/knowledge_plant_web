@@ -81,7 +81,6 @@ export default defineComponent({
       }).then((resp) => {
         console.log(resp);
         ebooks.value = resp.data.data.list;
-        // ebooks1.books = data.content;
       });
     };
     const level1 =  ref();
@@ -101,6 +100,8 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
           console.log("树形结构：", level1.value);
+          handleQueryEbook();
+
         } else {
           message.error(data.message);
         }
@@ -110,7 +111,6 @@ export default defineComponent({
 
     onMounted(() => {
       handleQueryCategory();
-      handleQueryEbook();
     });
 
     return {
