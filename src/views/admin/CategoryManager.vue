@@ -155,6 +155,8 @@ export default defineComponent({
           level1.value = [];
           console.log(categorys.value);
            level1.value = Tool.array2Tree(categorys.value,0);
+          console.log("打印树形数组");
+
           console.log(level1.value);
            // 重置分页按钮
         } else {

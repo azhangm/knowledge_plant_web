@@ -89,12 +89,17 @@
         <a-input v-model:value="doc.name" />
       </a-form-item>
       <a-form-item label="父文档">
-      <a-select ref="select" v-model:value="doc.parent">
-        <a-select-option value="0">无</a-select-option>
-        <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="c.id === doc.id">
-          {{c.name}}
-        </a-select-option>
-      </a-select>
+        <a-tree-select
+            v-model:value="doc.parent"
+            tree-data-simple-mode
+            style="width: 100%"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            :tree-data="treeSelectData"
+            placeholder=" 请选择父文档"
+            :load-data="onLoadData"
+            :replaceFields="{title : 'name' , key : 'id' , value : 'id'}"
+        />
+
         </a-form-item>
 
         <a-form-item label="顺序">
@@ -123,6 +128,10 @@ export default defineComponent({
       {
         title: '名称',
         dataIndex: 'name'
+      },
+      {
+        title: "博客名称",
+        dataIndex: 'ebookId'
       },
       {
         title: '父文档',
@@ -154,10 +163,10 @@ export default defineComponent({
         if (data.success) {
           docs.value = data.data;
           level1.value = [];
-          console.log(docs.value);
            level1.value = Tool.array2Tree(docs.value,0);
-          console.log(level1.value);
-           // 重置分页按钮
+          treeSelectData.value = Tool.copy(level1.value) || [];
+          // 为选择树添加一个"无"
+          treeSelectData.value.unshift({id: 0, name: '无'});
         } else {
           message.error(data.message);
         }
@@ -187,14 +196,7 @@ export default defineComponent({
       });
     };
 
-    /**
-     * 编辑
-     */
-    const edit = (record: any) => {
-      modalVisible.value = true;
-      // docIds.value = [doc.value.doc1Id, doc.value.doc2Id]
-      doc.value = Tool.copy(record) ;
-    };
+
     const handleModalAdd = () => {
       modalLoading.value = true;
       // doc.value.doc1Id = docIds.value[0];
@@ -213,13 +215,7 @@ export default defineComponent({
         }
       });
     };
-    /**
-     * 新增
-     */
-    const add = () => {
-      addEbookVisable.value = true;
-      doc.value = {};
-    };
+
 
     const handleDelete = (id: number) => {
       axios.delete("/doc/delete/" + id).then((response) => {
@@ -234,13 +230,61 @@ export default defineComponent({
         }
       });
     };
-
-
+    let treeSelectData = ref();
+    treeSelectData.value = [];
+    const setDisable = (treeSelectData : any , id : any) => {
+        for (let i = 0 ; i < treeSelectData.length; i ++) {
+            const node = treeSelectData[i];
+            if (node.id === id) {
+              node.disabled = true;
+              const  children = node.children;
+              if (Tool.isNotEmpty(children)) {
+                for (let j = 0 ; j < children.length ; j ++) {
+                  setDisable(children,children[j].id);
+                }
+              }
+            }else {
+              const children = node.children;
+              if (Tool.isNotEmpty(children))
+              setDisable(children,id);
+            }
+        }
+    }
+    /**
+     * 编辑
+     */
 
     onMounted(() => {
       handleQuery({});
     });
+    const edit = (record: any) => {
+      // 清空富文本框
+      modalVisible.value = true;
+      doc.value = Tool.copy(record);
 
+      // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
+      treeSelectData.value = Tool.copy(level1.value);
+      setDisable(treeSelectData.value, record.id);
+
+      // 为选择树添加一个"无"
+      treeSelectData.value.unshift({id: 0, name: '无'});
+    };
+
+    /**
+     * 新增
+     */
+    const add = () => {
+      // 清空富文本框
+      modalVisible.value = true;
+      doc.value = {
+
+      };
+
+      treeSelectData.value = Tool.copy(level1.value) || [];
+
+      // 为选择树添加一个"无"
+      treeSelectData.value.unshift({id: 0, name: '无'});
+    };
     return {
       param,
       columns,
@@ -249,7 +293,7 @@ export default defineComponent({
       level1,
       edit,
       add,
-
+      treeSelectData,
       doc,
       addEbookVisable,
       handleModalAdd,
