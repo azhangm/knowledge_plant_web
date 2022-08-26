@@ -114,6 +114,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
 import {Tool} from '@/assets/ts/tool'
+import {useRoute} from "vue-router";
 const level1 = ref();
 const param = ref();
 param.value = {};
@@ -123,6 +124,7 @@ const loading = ref(false);
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
+    const route = useRoute();
 
     const columns = [
       {
@@ -275,9 +277,9 @@ export default defineComponent({
      */
     const add = () => {
       // 清空富文本框
-      modalVisible.value = true;
+      addEbookVisable.value = true;
       doc.value = {
-
+        ebookId : route.query.ebookId
       };
 
       treeSelectData.value = Tool.copy(level1.value) || [];
