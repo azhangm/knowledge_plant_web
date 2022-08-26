@@ -105,6 +105,11 @@
         <a-form-item label="顺序">
         <a-input v-model:value="doc.sort" />
       </a-form-item>
+
+
+      <a-form-item label="编辑内容">
+        <div id="content"></div>
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
@@ -120,11 +125,10 @@ const param = ref();
 param.value = {};
 const docs = ref([]);
 const loading = ref(false);
-
+import E from 'wangeditor'
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
-    const route = useRoute();
 
     const columns = [
       {
@@ -155,6 +159,8 @@ export default defineComponent({
     /**
      * 数据查询
      **/
+    const route = useRoute();
+    const editor = new E("#content");
     const handleQuery = (params: any) => {
       loading.value = true;
       // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
@@ -180,6 +186,9 @@ export default defineComponent({
     const addEbookVisable = ref(false);
     const modalVisible = ref(false);
     const modalLoading = ref(false);
+    doc.value = {
+      ebookId: route.query.ebookId
+    };
     const handleModalOk = () => {
       modalLoading.value = true;
       // doc.value.doc1Id = docIds.value[0];
@@ -217,10 +226,17 @@ export default defineComponent({
         }
       });
     };
+    const deleteIds: Array<string> = [];
+    const deleteNames: Array<string> = [];
+
 
 
     const handleDelete = (id: number) => {
-      axios.delete("/doc/delete/" + id).then((response) => {
+      getDeleteIds(level1.value,id);
+      console.log("level1")
+      console.log( level1.value)
+      console.log(deleteIds);
+      axios.delete("/doc/delete/" + deleteIds.join(",")).then((response) => {
         const data = response.data; // data = commonResp
         if (data.success) {
           // 重新加载列表
@@ -231,6 +247,42 @@ export default defineComponent({
           message.error(data.message);
         }
       });
+    };
+    /**
+     * 查找整根树枝
+     */
+    const getDeleteIds = (treeSelectData: [], id: any) => {
+      // console.log(treeSelectData, id);
+      // 遍历数组，即遍历某一层节点\
+      console.log("delet 数组长度"  + treeSelectData.length)
+      console.log(treeSelectData);
+      for (let i = 0; i < treeSelectData.length; i++) {
+        const node = treeSelectData[i];
+        if (node.id === id) {
+          // 如果当前节点就是目标节点
+          console.log("delete", node);
+          // 将目标ID放入结果集ids
+          // node.disabled = true;
+          deleteIds.push(id);
+          console.log("ids" + deleteIds)
+          deleteNames.push(node.name);
+
+          // 遍历所有子节点
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            for (let j = 0; j < children.length; j++) {
+              getDeleteIds(children, children[j].id)
+            }
+          }
+        } else {
+          console.log("delete", node);
+          // 如果当前节点不是目标节点，则到其子节点再找找看。
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            getDeleteIds(children, id);
+          }
+        }
+      }
     };
     let treeSelectData = ref();
     treeSelectData.value = [];
@@ -252,17 +304,24 @@ export default defineComponent({
             }
         }
     }
+    //dfs
+
     /**
      * 编辑
      */
 
     onMounted(() => {
       handleQuery({});
+
     });
     const edit = (record: any) => {
+``
       // 清空富文本框
       modalVisible.value = true;
       doc.value = Tool.copy(record);
+      setTimeout(() => {
+        editor.create();
+      },100);
 
       // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
       treeSelectData.value = Tool.copy(level1.value);
@@ -279,9 +338,11 @@ export default defineComponent({
       // 清空富文本框
       addEbookVisable.value = true;
       doc.value = {
-        ebookId : route.query.ebookId
+        ebookId: route.query.ebookId
       };
-
+      setTimeout(() => {
+        editor.create();
+      },100);
       treeSelectData.value = Tool.copy(level1.value) || [];
 
       // 为选择树添加一个"无"
@@ -303,7 +364,7 @@ export default defineComponent({
       modalLoading,
       handleModalOk,
       docIds,
-
+      getDeleteIds,
       handleDelete
     }
   }
