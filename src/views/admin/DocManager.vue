@@ -3,57 +3,101 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <p>
-        <a-form layout="inline" :model="param">
-          <a-form-item>
-            <a-input v-model:value="param.name" placeholder="名称" size="large">
-            </a-input>
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" @click="handleQuery()" size="large">
-              查询
-            </a-button>
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" @click="add()" size="large">
-              新增
-            </a-button>
-          </a-form-item>
-        </a-form>
-      </p>
+      <a-row>
+        <a-col :span="6">
+          <p>
+            <a-form layout="inline" :model="param">
+              <a-form-item>
+                <a-input v-model:value="param.name" placeholder="名称" size="large">
+                </a-input>
+              </a-form-item>
+              <a-form-item>
+                <a-button type="primary" @click="handleQuery()" size="large">
+                  查询
+                </a-button>
+              </a-form-item>
+              <a-form-item>
+                <a-button type="primary" @click="add()" size="large">
+                  新增
+                </a-button>
+              </a-form-item>
+            </a-form>
+          </p>
 
-      <a-table
-          :columns="columns"
-          :row-key="record => record.id"
-          :data-source="level1"
-          :loading="loading"
-          @change="handleTableChange"
-          :pagination="false"
-      >
-        <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="avatar" />
-        </template>
+          <a-table
+              :columns="columns"
+              :row-key="record => record.id"
+              :data-source="level1"
+              :loading="loading"
+              @change="handleTableChange"
+              :pagination="false"
+              size="small"
+          >
+            <template #cover="{ text: cover }">
+              <img v-if="cover" :src="cover" alt="avatar" />
+            </template>
 
-        <template v-slot:action="{ text : record }">
-          <a-space size="small">
-            <a-button type="primary" @click="edit(record)">
-              编辑
-            </a-button>
-            <a-popconfirm
-                title="删除后不可恢复，确认删除?"
-                ok-text="是"
-                cancel-text="否"
-                @confirm="handleDelete(record.id)"
-            >
-              <a-button type="danger" >
-                删除
+            <template v-slot:action="{ text : record }">
+              <a-space size="small">
+                <a-button type="primary" @click="edit(record)">
+                  编辑
+                </a-button>
+                <a-popconfirm
+                    title="删除后不可恢复，确认删除?"
+                    ok-text="是"
+                    cancel-text="否"
+                    @confirm="handleDelete(record.id)"
+                >
+                  <a-button type="danger" >
+                    删除
+                  </a-button>
+                </a-popconfirm>
+              </a-space>
+            </template>
+          </a-table>
+
+
+        </a-col>
+        <a-col :span="18">
+          <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+            <a-form-item >
+              <a-button type="primary" @click="handleModalOk"  class="button">
+                保存
               </a-button>
-            </a-popconfirm>
-          </a-space>
-        </template>
-      </a-table>
+            </a-form-item>
+            <a-form-item label="名称">
+              <a-input v-model:value="doc.name" />
+            </a-form-item>
+            <a-form-item label="父文档">
+              <a-tree-select
+                  v-model:value="doc.parent"
+                  tree-data-simple-mode
+                  style="width: 100%"
+                  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                  :tree-data="treeSelectData"
+                  placeholder=" 请选择父文档"
+                  :load-data="onLoadData"
+                  :replaceFields="{title : 'name' , key : 'id' , value : 'id'}"
+              />
+
+            </a-form-item>
+
+            <a-form-item label="顺序">
+              <a-input v-model:value="doc.sort" />
+            </a-form-item>
+
+
+            <a-form-item label="编辑内容">
+              <div id="content"></div>
+            </a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
     </a-layout-content>
   </a-layout>
+
+
+
   <a-modal
       title="文档表单"
       v-model:visible="addEbookVisable"
@@ -75,43 +119,21 @@
       <a-form-item label="顺序">
         <a-input v-model:value="doc.sort" />
       </a-form-item>
-    </a-form>
-  </a-modal>
-
-  <a-modal
-      title="文档表单"
-      v-model:visible="modalVisible"
-      :confirm-loading="modalLoading"
-      @ok="handleModalOk"
-  >
-    <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-      <a-form-item label="名称">
-        <a-input v-model:value="doc.name" />
-      </a-form-item>
-      <a-form-item label="父文档">
-        <a-tree-select
-            v-model:value="doc.parent"
-            tree-data-simple-mode
-            style="width: 100%"
-            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-            :tree-data="treeSelectData"
-            placeholder=" 请选择父文档"
-            :load-data="onLoadData"
-            :replaceFields="{title : 'name' , key : 'id' , value : 'id'}"
-        />
-
-        </a-form-item>
-
-        <a-form-item label="顺序">
-        <a-input v-model:value="doc.sort" />
-      </a-form-item>
-
 
       <a-form-item label="编辑内容">
-        <div id="content"></div>
+        <div id="content1"></div>
       </a-form-item>
     </a-form>
   </a-modal>
+
+<!--  <a-modal-->
+<!--      title="文档表单"-->
+<!--      v-model:visible="modalVisible"-->
+<!--      :confirm-loading="modalLoading"-->
+<!--      @ok="handleModalOk"-->
+<!--  >-->
+<!--   -->
+<!--  </a-modal>-->
 </template>
 
 <script lang="ts">
@@ -139,16 +161,16 @@ export default defineComponent({
         title: "博客名称",
         dataIndex: 'ebookId'
       },
-      {
-        title: '父文档',
-        dataIndex: 'parent',
-        key: 'parent'
-      },
-      {
-        title: '顺序',
-        dataIndex: 'sort',
-        key: 'sort'
-      },
+      // {
+      //   title: '父文档',
+      //   dataIndex: 'parent',
+      //   key: 'parent'
+      // },
+      // {
+      //   title: '顺序',
+      //   dataIndex: 'sort',
+      //   key: 'sort'
+      // },
       {
         title: 'Action',
         key: 'action',
@@ -161,6 +183,9 @@ export default defineComponent({
      **/
     const route = useRoute();
     const editor = new E("#content");
+    const editor1 = new E("#content1");
+    editor.config.zIndex=0;
+    editor1.config.zIndex = 0;
     const handleQuery = (params: any) => {
       loading.value = true;
       // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
@@ -251,7 +276,7 @@ export default defineComponent({
     /**
      * 查找整根树枝
      */
-    const getDeleteIds = (treeSelectData: [], id: any) => {
+    const getDeleteIds = (treeSelectData: any, id: any) => {
       // console.log(treeSelectData, id);
       // 遍历数组，即遍历某一层节点\
       console.log("delet 数组长度"  + treeSelectData.length)
@@ -312,6 +337,7 @@ export default defineComponent({
 
     onMounted(() => {
       handleQuery({});
+      editor.create();
 
     });
     const edit = (record: any) => {
@@ -319,9 +345,7 @@ export default defineComponent({
       // 清空富文本框
       modalVisible.value = true;
       doc.value = Tool.copy(record);
-      setTimeout(() => {
-        editor.create();
-      },100);
+
 
       // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
       treeSelectData.value = Tool.copy(level1.value);
@@ -341,7 +365,7 @@ export default defineComponent({
         ebookId: route.query.ebookId
       };
       setTimeout(() => {
-        editor.create();
+        editor1.create();
       },100);
       treeSelectData.value = Tool.copy(level1.value) || [];
 
@@ -375,5 +399,9 @@ export default defineComponent({
 img {
   width: 50px;
   height: 50px;
+}
+
+.button{
+  margin-left: 34%;
 }
 </style>
