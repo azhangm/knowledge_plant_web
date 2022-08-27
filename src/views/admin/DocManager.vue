@@ -262,6 +262,7 @@ export default defineComponent({
 
           // 重新加载列表
           handleQuery({});
+          message.success("保存成功");
         } else {
           message.error(data.message);
         }
@@ -359,6 +360,7 @@ export default defineComponent({
     const edit = (record: any) => {
 ``
       // 清空富文本框
+      editor.txt.html("");
       modalVisible.value = true;
       doc.value = Tool.copy(record);
 
@@ -375,6 +377,7 @@ export default defineComponent({
      * 新增
      */
     const add = () => {
+      editor.txt.html("");
       addEbookVisable.value = true;
       docAdd.value = {
         ebookId: route.query.ebookId
