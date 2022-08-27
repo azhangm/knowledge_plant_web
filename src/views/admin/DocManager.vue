@@ -208,6 +208,21 @@ export default defineComponent({
       });
     };
 
+    const handleQueryContent = (params: any) => {
+      axios.get("/doc/findContent/" + doc.value.id).then((resp) => {
+        const data = resp.data;
+        if (data.success) {
+          console.log(resp);
+          editor.txt.html(data.data)
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
+
+
+
     const docIds = ref();
     const doc = ref();
     const docAdd = ref();
@@ -351,7 +366,7 @@ export default defineComponent({
       // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
       treeSelectData.value = Tool.copy(level1.value);
       setDisable(treeSelectData.value, record.id);
-
+      handleQueryContent(doc.value);
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
     };
@@ -360,7 +375,6 @@ export default defineComponent({
      * 新增
      */
     const add = () => {
-      // 清空富文本框
       addEbookVisable.value = true;
       docAdd.value = {
         ebookId: route.query.ebookId
