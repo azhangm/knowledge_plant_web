@@ -32,6 +32,7 @@
               @change="handleTableChange"
               :pagination="false"
               size="small"
+              :defaultExpandAllRows="true"
           >
             <template #cover="{ text: cover }">
               <img v-if="cover" :src="cover" alt="avatar" />
@@ -104,12 +105,12 @@
       :confirm-loading="modalLoading"
       @ok="handleModalAdd"
   >
-    <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+    <a-form :model="docAdd" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="名称">
-        <a-input v-model:value="doc.name" />
+        <a-input v-model:value="docAdd.name" />
       </a-form-item>
       <a-form-item label="父文档">
-        <a-select ref="select" v-model:value="doc.parent">
+        <a-select ref="select" v-model:value="docAdd.parent">
           <a-select-option value="0">无</a-select-option>
           <a-select-option v-for="c in level1" :key="c.id" :value="c.id">
                   {{c.name}}
@@ -117,7 +118,7 @@
         </a-select>
       </a-form-item>
       <a-form-item label="顺序">
-        <a-input v-model:value="doc.sort" />
+        <a-input v-model:value="docAdd.sort" />
       </a-form-item>
 
       <a-form-item label="编辑内容">
@@ -151,6 +152,7 @@ import E from 'wangeditor'
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
+
 
     const columns = [
       {
@@ -208,6 +210,7 @@ export default defineComponent({
 
     const docIds = ref();
     const doc = ref();
+    const docAdd = ref();
     const addEbookVisable = ref(false);
     const modalVisible = ref(false);
     const modalLoading = ref(false);
@@ -216,8 +219,7 @@ export default defineComponent({
     };
     const handleModalOk = () => {
       modalLoading.value = true;
-      // doc.value.doc1Id = docIds.value[0];
-      // doc.value.doc2Id = docIds.value[1];
+      doc.value.content =  editor.txt.html();
       axios.put("/doc/update/", doc.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
@@ -235,9 +237,8 @@ export default defineComponent({
 
     const handleModalAdd = () => {
       modalLoading.value = true;
-      // doc.value.doc1Id = docIds.value[0];
-      // doc.value.doc2Id = docIds.value[1];
-      axios.post("/doc/save/", doc.value).then((response) => {
+      docAdd.value.content =  editor1.txt.html();
+      axios.post("/doc/save/", docAdd.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {
@@ -361,7 +362,7 @@ export default defineComponent({
     const add = () => {
       // 清空富文本框
       addEbookVisable.value = true;
-      doc.value = {
+      docAdd.value = {
         ebookId: route.query.ebookId
       };
       setTimeout(() => {
@@ -380,6 +381,7 @@ export default defineComponent({
       level1,
       edit,
       add,
+      docAdd,
       treeSelectData,
       doc,
       addEbookVisable,
